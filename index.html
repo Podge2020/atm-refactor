@@ -6,26 +6,28 @@
 </head>
 
 <body>
+    <!--HTML Needs: Welcome, uniform buttons, color theme, centering/grid-->
     <div id="start"> 
         <label>Input your pin:</label>
         <input id="pinput"></input>
-        <button onclick="login()">Submit</button>
+        <button onclick="login()">Submit</button> <!--calls login() function when SUBMIT button clicked using PIN entered with id="pinput" as argument -->
         <p id="account"></p>
 
-        <label>New account:</label>
-        <input id="newpinput"></input>
-        <button onclick="newAccount()">Submit</button>
+        <label>New account:</label> 
+        <input id="newpinput"></input> 
+        <button onclick="newAccount()">Submit</button> <!--calls newAccount() function when SUBMIT button clicked using PIN entered with id="newpinput" as argument -->
     </div>
 
+    <!--HTML Needs: Greeting, uniform buttons, color theme, centering/grid-->
     <div id="menu" style="display:none"> 
-        <button onclick="displayBalance()">Get Balance</button>
+        <button onclick="displayBalance()">Get Balance</button> <!--calls displayBalance() function when GET BALANCE button clicked and shows balance total on the screen -->
         <p id="balance"></p>
 
-        <button onclick="displayWithrawal()">Withdrawal</button>
+        <button onclick="displayWithrawal()">Withdrawal</button> <!--calls displayWithdrawal() function when WITHDRAWAL button clicked and allows for input to subtract from account  -->
 
-        <button onclick="displayDeposit()">Deposit</button>
+        <button onclick="displayDeposit()">Deposit</button> <!--calls displayDeposit() function when DEPOSIT button clicked and allows for input to add to account -->
        
-        <button onclick="returnToMenu()">Logout</button>
+        <button onclick="returnToMenu()">Logout</button> <!--calls returnToMenu() function when LOGOUT button clicked and returns to original Log-In view -->
     </div>
 
     <script>
@@ -38,10 +40,13 @@
         }
 
         /*----------- the code to manipute data/ logic goes here --------*/ 
+        
         function Atm() {
             this.accounts = [];
             this.currentAccount = null; 
         
+
+            //createAccount() takes a pin argument and creates a new account with it using the Account constructor function and sets the currentAccount property to this new account      
             this.createAccount = function (pin){
                     let newAccount = new Account(pin);
                     this.accounts.push(newAccount);
@@ -49,7 +54,8 @@
                     updateATM(); 
                     return newAccount; 
             };
-
+            
+            //getAccount() takes a pin argument and finds account using a for loop over the accounts array of all accounts saved and changes the value of currentAccount property to this account  
             this.getAccount = function (pin){
                 for (let i = 0; i < this.accounts.length; i++) {
                     if (this.accounts[i].pin === pin) {
@@ -63,17 +69,18 @@
             }; 
         }
 
+        //
         function Account(pin) { 
             this.pin = pin;
             this.balance = 0;
 
-            //withdrawal
+            //withdrawal is a function taking the argument wdAmount entered by the user and subtracts it from the account balance then calls updateATM() function to save in local storage 
             this.withdrawal = function(wdAmount){
                 this.balance = this.balance - wdAmount; 
                 updateATM(); 
             }
 
-            //deposit 
+            //deposit is a function taking the argument depAmount entered by the user and adds it to the account balance then calls updateATM() function to save in local storage 
             this.deposit = function(depAmount){
                 this.balance = this.balance + depAmount;
                 updateATM(); 
@@ -81,6 +88,7 @@
 
         }
 
+        //updates the changes made into local storage so it can be accessed after the page is closed and reopened. 
         function updateATM(){ 
             localStorage.setItem("atm_accts",  JSON.stringify(atm.accounts) ); 
         }
@@ -102,23 +110,27 @@
             
         }
 
+        //displayBalance() finds the element in the HTML body tag that has id="balance" and in that spot prints to the page the result of atm balance property using the syntax accessing the object with "atm.currentAccount.balance"  
         function displayBalance() { 
             document.getElementById("balance").innerHTML = 
             atm.currentAccount.balance; 
         }
 
+        //pop-up promopt asks for a value to be entered for how to be subtracted; the Number() method turns the prompt answered string into an integer assigned to the variable amount. 
         function displayWithrawal() {
             let amount = Number(prompt("How much would you like to withdrawal?", ""));
             atm.currentAccount.withdrawal(amount); 
             displayBalance(); 
         }
         
+        //pop-up promopt asks for a value to be entered for how to be added; the Number() method turns the prompt answered string into an integer assigned to the variable amount. 
         function displayDeposit() {
             let amount = Number(prompt("How much would you like to deposit?", ""));
             atm.currentAccount.deposit(amount); 
             displayBalance(); 
         }
         
+        //compares pin entered to 
         function newAccount(){
                 let pin = parseInt(document.getElementById("newpinput").value);
                 if(atm.getAccount(pin) != null){
