@@ -17,8 +17,7 @@
         <input id="newpinput"></input> 
         <button onclick="newAccount()">Submit</button> <!--calls newAccount() function when SUBMIT button clicked using PIN entered with id="newpinput" as argument -->
     </div>
-
-    <!--HTML Needs: Greeting, uniform buttons, color theme, centering/grid-->
+   
     <div id="menu" style="display:none"> 
         <button onclick="displayBalance()">Get Balance</button> <!--calls displayBalance() function when GET BALANCE button clicked and shows balance total on the screen -->
         <p id="balance"></p>
@@ -32,39 +31,31 @@
         <button onclick="returnToMenu()">Logout</button> <!--calls returnToMenu() function when LOGOUT button clicked and returns to original Log-In view -->
     </div>
 
-    <script>
-        /* When the page loads get the ATM accounts out of local storage */ 
-        let atm = new Atm(); 
-        atm.accounts = JSON.parse(localStorage.getItem("atm_accts")); 
-        /* if there are no accounts, make sure we initialize with an empty array */
-        if(atm.accounts === null){
-            atm.accounts = []; 
-        }
+    <div id="date-time" style="padding-top: 20px; font-style: italic;"></div> <!-- creates area for date and time to be printed on the screen-->
 
+    <script>
+         //uses the Date object constructor to set the date and time on the screen by accessing the id="date-time" and changing the return Date numbers into strings 
+        let dt = new Date();
+        document.getElementById("date-time").innerHTML = dt.toString();
         /*----------- the code to manipute data/ logic goes here --------*/ 
         
-        function Atm() {
-            this.accounts = [];
-            //[Account, Account, Account]
-            /* Account { 
-                pin : 1283
-                balance: 0
-                deposit : function
-                withdrawal : function
-             } */ 
-            this.currentAccount = null; 
+        class Atm {
+            constructor() {
+                this.accounts = [];
+                this.currentAccount = null; 
+            }
         
-
             //createAccount() takes a pin argument and creates a new account with it using the Account constructor function and sets the currentAccount property to this new account      
-            this.createAccount = function (pin){
+            createAccount(pin) {
                     let newAccount = new Account(pin);
                     this.accounts.push(newAccount);
                     this.currentAccount = newAccount; 
                     updateATM(); 
                     return newAccount; 
             };
+
             //updateAccount() takes the newPin as an agrument and runs a for loop over then entire array of accounts checking if the pin already exists or not
-            this.updateAccount = function(newPin){
+           updateAccount(newPin) {
                // let arrAccount = atm.getAccount(atm.currentAccount.pin);
                  //   atm.accounts[currentAcct.index].pin = pin;  
                 for (let i = 0; i < this.accounts.length; i++) {
@@ -80,7 +71,7 @@
 
 
             //getAccount() takes a pin argument and finds account using a for loop over the accounts array of all accounts saved and changes the value of currentAccount property to this account  
-            this.getAccount = function (pin){
+            getAccount(pin) {
                 for (let i = 0; i < this.accounts.length; i++) {
                     if (this.accounts[i].pin === pin) {
                         //return the bank account that matches our pin
@@ -94,40 +85,30 @@
         }
 
         //
-        function Account(pin) { 
-            this.pin = pin;
-            this.balance = 0;
+        class Account { 
+            constructor(pin) {
+                this.pin = pin;
+                this.balance = 0;
+            }
+        
 
             //withdrawal is a function taking the argument wdAmount entered by the user and subtracts it from the account balance then calls updateATM() function to save in local storage 
-            this.withdrawal = function(wdAmount){
-                this.balance = this.balance - wdAmount; 
+            withdrawal(wdAmount) {
+                this.balance = this.balance - wdAmount - 5; 
                 updateATM(); 
             }
 
             //deposit is a function taking the argument depAmount entered by the user and adds it to the account balance then calls updateATM() function to save in local storage 
-            this.deposit = function(depAmount){
-                this.balance = this.balance + depAmount;
+            deposit(depAmount) {
+                this.balance = this.balance + depAmount - 5;
                 updateATM(); 
             }
 
             //change pin
-            this.changePin = function(newPin){
+            changePin(newPin) {
                 this.pin = newPin; 
                 updateATM(); 
             }
-
-            /* Paige's original attempt: 
-            this.changePIN = function(newPIN) {
-                //logic will go here to change and update storage of PIN 
-                for (i=0; i < atm.accounts.length; i++) {
-                    if (newPIN === pin) {
-                        alert("Invalid. PIN taken.")
-                    }
-                    else {
-                        updateATM(); 
-                    }
-                }          
-            }*/
 
         }
 
@@ -139,6 +120,15 @@
         /*-------------  UI side/display logic ------------------------*/ 
         /*------------- The methods to manipulate UI go here ----------*/
         
+              /* When the page loads get the ATM accounts out of local storage */ 
+        let atm = new Atm(); 
+        atm.accounts = JSON.parse(localStorage.getItem("atm_accts")); 
+        /* if there are no accounts, make sure we initialize with an empty array */
+        if(atm.accounts === null){
+            atm.accounts = []; 
+        }
+
+
         //display login
         function returnToMenu(){
             /* clear the fields in the menu */ 
@@ -161,6 +151,7 @@
 
         //pop-up promopt asks for a value to be entered for how to be subtracted; the Number() method turns the prompt answered string into an integer assigned to the variable amount. 
         function displayWithrawal() {
+            confirm("I am aware of processing fees charged for this service.");
             let amount = Number(prompt("How much would you like to withdrawal?", ""));
             atm.currentAccount.withdrawal(amount); 
             displayBalance(); 
@@ -168,6 +159,7 @@
         
         //pop-up promopt asks for a value to be entered for how to be added; the Number() method turns the prompt answered string into an integer assigned to the variable amount. 
         function displayDeposit() {
+            confirm("I am aware of processing fees charged for this service.");
             let amount = Number(prompt("How much would you like to deposit?", ""));
             atm.currentAccount.deposit(amount); 
             displayBalance(); 
@@ -212,8 +204,6 @@
                 displayMenu(); 
             }
         }
-
-        
         
         function displayMenu(){
            
